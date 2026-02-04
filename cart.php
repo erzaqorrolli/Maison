@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Shopping Cart</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #fff8f2;
+    margin: 0;
+    padding: 20px;
+}
+h1 { text-align: center; margin-bottom: 30px; }
+
+h1 a{
+    text-decoration: none;
+    color: #6b3e26;
+}
+
+.cart-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 900px;
+    margin: auto;
+}
+
+.cart-item {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    padding: 15px;
+    background: #fff;
+    border: 2px solid #6b3e26;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.cart-item img {
+    width: 100px;
+    height: 80px;
+    object-fit: contain;
+}
+
+.cart-details {
+    flex-grow: 1;
+}
+
+.cart-details strong {
+    font-size: 18px;
+    color: #333;
+}
+
+.cart-details p {
+    margin: 5px 0;
+    font-size: 16px;
+    color: #555;
+}
+
+.quantity-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quantity-box button {
+    background: #6b3e26;
+    color: #fff;
+    border: none;
+    padding: 5px 12px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.quantity-box button:hover {
+    background: #855c3a;
+}
+
+.remove-btn {
+    background: #ff4c4c;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.remove-btn:hover { background: #e63939; }
+
+.total-section {
+    max-width: 900px;
+    margin: 20px auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #6b3e26;
+}
+
+.checkout-btn {
+    background: #6b3e26;
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 16px;
+}
+.checkout-btn:hover { background: #855c3a; }
+
+@media screen and (max-width: 600px) {
+    .cart-item { flex-direction: column; align-items: flex-start; }
+    .cart-item img { width: 100%; height: auto; }
+    .quantity-box { margin-top: 10px; }
+}
+</style>
+</head>
+<body>
+
+<h1><a href="homee.php">Your Shopping Cart</a></h1>
+
+<div class="cart-container" id="cartContainer">
+    
+</div>
+
+<div class="total-section">
+    <span id="totalPrice">Total: $0.00</span>
+    <button class="checkout-btn" onclick="checkout()">Checkout</button>
+</div>
+
+<script>
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+const cartContainer = document.getElementById("cartContainer");
+const totalPriceEl = document.getElementById("totalPrice");
+
+function updateCart() {
+    cartContainer.innerHTML = "";
+    let total = 0;
+
+    cart.forEach((item, index) => {
+        const pricePerUnit = parseFloat(item.pricePerUnit) || 0;
+        const qty = parseInt(item.qty) || 0;
+        const itemTotal = (pricePerUnit * qty).toFixed(2);
+        total += parseFloat(itemTotal);
+
+        const div = document.createElement("div");
+        div.classList.add("cart-item");
+        div.innerHTML = `
+            <img src="img/${item.img}" alt="${item.name}">
+            <div class="cart-details">
+                <strong>${item.name}</strong>
+                <p>$${pricePerUnit.toFixed(2)} x ${qty} = $${itemTotal}</p>
+                <div class="quantity-box">
+                    <button onclick="changeQty(${index}, -1)">-</button>
+                    <span>${qty}</span>
+                    <button onclick="changeQty(${index}, 1)">+</button>
+                </div>
+            </div>
+            <button class="remove-btn" onclick="removeItem(${index})">Remove</button>
+        `;
+        cartContainer.appendChild(div);
+    });
+
+    totalPriceEl.textContent = `Total: $${total.toFixed(2)}`;
+    localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+function changeQty(index, delta) {
+    cart[index].qty = Math.min(Math.max(cart[index].qty + delta, 1), 20);
+    updateCart();
+}
+
+function removeItem(index) {
+    cart.splice(index, 1);
+    updateCart();
+}
+
+function checkout() {
+    
+    window.location.href = "checkout.php";
+}
+
+
+
+updateCart();
+</script>
+
+</body>
+</html>
